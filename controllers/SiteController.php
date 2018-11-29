@@ -53,6 +53,16 @@ class SiteController extends Controller {
 		];
 	}
 
+	public function beforeAction($action) {
+
+		if ( in_array( $action->id, [ 'notify', 'receivecall', 'respond' ] ) ) {
+			Yii::$app->controller->enableCsrfValidation = false;
+		}
+
+		return parent::beforeAction($action);
+	}
+
+
 	/**
 	 * Displays homepage.
 	 *
@@ -68,18 +78,22 @@ class SiteController extends Controller {
 	 * return $string
 	 */
 	public function actionNotify() {
+
 		$order_number  = "ORDER0001";
 		$customer_name = "NAME OF CUSTOMER";
 		$response      = new Twiml();
 		$response->say( 'Hello, you have a new customer order from ' . $customer_name . ' reference ' . $order_number . '. Please check your merchant app or control panel for order details. Press 1 to confirm this message.' );
+
 		\Yii::$app->response->format = \yii\web\Response::FORMAT_XML;
+
 		echo $response;
 	}
 
 	/**
-	 * url to make the call
+	 * make the call to the restaurant
 	 */
 	public function actionMakecall() {
+
 		// Find your Account Sid and Auth Token at twilio.com/console
 		$sid    = "ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 		$token  = "your_auth_token";
@@ -96,9 +110,11 @@ class SiteController extends Controller {
 	 * the webhook for receiving calls
 	 */
 	public function actionReceivecall() {
+
 		$response = new TwiML();
 		// Use the <Gather> verb to collect user input
 		$gather = $response->gather( array( 'numDigits' => 1, 'action' => 'BASE_URL/respond' ) );
+
 		// use the <Say> verb to request input from the user
 		$gather->say( 'Thanks for calling our restaurant. For french fries, press 1. For energy drinks, press 2.' );
 
@@ -107,6 +123,7 @@ class SiteController extends Controller {
 
 		// Render the response as XML in reply to the webhook request
 		\Yii::$app->response->format = \yii\web\Response::FORMAT_XML;
+
 		echo $response;
 	}
 
@@ -114,6 +131,7 @@ class SiteController extends Controller {
 	 * handling the user inputs
 	 */
 	public function actionRespond() {
+
 		$response = new TwiML();
 
 		// If the user entered digits, process their request
@@ -133,6 +151,7 @@ class SiteController extends Controller {
 			// If no input was sent, redirect to the /voice route
 			$response->redirect( 'BASE_URL/receivecall' );
 		}
+
 		\Yii::$app->response->format = \yii\web\Response::FORMAT_XML;
 		echo $response;
 
