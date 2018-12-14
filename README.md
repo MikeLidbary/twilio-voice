@@ -1,6 +1,7 @@
 # twilio-voice
 Implementing Twilio Voice Calls in PHP with Yii2
 
+![](https://www.dropbox.com/s/1fx8gdvezuobwah/Yii2_Voice_Calls.width-808.png?dl=0)
 ## Getting Started
 
 * Clone the application:
